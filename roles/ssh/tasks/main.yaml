@@ -1,0 +1,18 @@
+---
+- name: Generate authorized_keys file
+  lineinfile:
+    line: '{{ item }}'
+    path: /etc/ssh/authorized_keys
+    mode: '0444'
+    state: present
+    create: yes
+    unsafe_writes: no
+  loop: "{{ ssh_pub_keys }}"
+
+- name: Update sshd_config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    mode: '0644'
+  notify: restart sshd
+...

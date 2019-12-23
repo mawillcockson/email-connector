@@ -1,0 +1,20 @@
+---
+- name: Setup server
+  hosts: all
+  remote_user: '{{ provision_username }}'
+  vars_files:
+    - vars.yaml
+  gather_facts: no # Don't gather facts until we know which user we can log in as
+  roles:
+    - {
+        roles: sudo
+        # If setup_root is true, login as root; otherwise, login as provision_username
+        remote_user: "{{ 'root' if setup_root|default(false) else provision_username }}"
+        # Only become if we're logging in as non-root
+        become: "{{ 'no' if setup_root|default(false) else 'yes' }}"
+        tags: ['setup', 'sudo']
+      }
+    - { role: ssh, tags: ['ssh'] }
+    - { role: firewall, tags: ['firewall'] }
+    - { role: dotfiles, tags: ['dotfiles'], when: setup_dotfiles|default(false) }
+...

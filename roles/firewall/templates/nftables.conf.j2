@@ -1,0 +1,43 @@
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+define ssh = 22
+
+table inet filter {
+
+    set open_ports {
+        type inet_service;
+        elements = {
+            ssh
+        }
+    }
+
+    chain incoming {
+        type filter hook input priority 0; policy drop;
+
+        # Allow from loopback (iif instead of iifname because lo always exists)
+        iif lo accept;
+
+        # Allow established connections
+        # 'related' state catches things like ICMP replies to closed UDP ports
+        # Allows return requests to things we send out
+        ct state established,related accept;
+
+        # Allow ssh
+        tcp dport @open_ports ct state new accept;
+
+        # Drop invalid connections
+        ct state invalid counter drop;
+    }
+
+    chain forwarding {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain outgoing {
+        type filter hook output priority 0; policy accept;
+    }
+}
+
+include "/etc/nftables/*.conf";

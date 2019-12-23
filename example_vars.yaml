@@ -1,0 +1,18 @@
+---
+# Change the following to the username of the user that will be used to login and administer the system,
+# either using Ansible or manually
+provision_username: notroot
+
+# Change the filename in the following to point to your public key file, or paste in your public key
+# List as many public keys as you would like; each will be listed in a global authorized_users file
+ssh_pub_keys:
+  - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+# Uncomment this if, when you provision a computer, you're expected to log in as root via SSH for initial
+# configuration
+#setup_root: true
+
+# Download and setup https://github.com/mawillcockson/dotfiles
+# Indicate a profile to use
+#setup_dotfiles: minimal
+...
