@@ -1,0 +1,9 @@
+---
+- name: Install dovecot packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - dovecot-pop3d
+    - dovecot-imapd
+...
