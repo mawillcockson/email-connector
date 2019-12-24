@@ -1,8 +1,4 @@
 ---
-- name: Gather facts
-  setup:
-    gather_timeout: 5
-
 - name: Add primary administration user
   user:
     name: '{{ provision_username }}'

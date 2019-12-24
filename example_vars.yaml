@@ -9,7 +9,9 @@ ssh_pub_keys:
   - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 # Uncomment this if, when you provision a computer, you're expected to log in as root via SSH for initial
-# configuration
+# configuration.
+# If left commented, or set to false, the user listed in provision_username is expected to exist, with python,
+# and is a user Ansible will use to gain passwordless privelege escalation
 #setup_root: true
 
 # Download and setup https://github.com/mawillcockson/dotfiles

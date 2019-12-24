@@ -14,11 +14,12 @@
     owner: root
     group: root
     mode: '0644'
+    validate: nft -cf %s
   notify: Reload nftables
 
 - name: Add directory for additional firewall rulesets
   file:
-    path: /etc/netfilter
+    path: /etc/nftables
     state: directory
     owner: root
     group: root
@@ -50,15 +51,20 @@
   when: nftables_modules is success
   register: firewall_modules
 
+- name: debug
+  debug:
+    var: firewall_modules
+
 - name: Load modules
   command: "modprobe {{ item }}"
-  become: True
   loop: "{{ nftables_modules.stdout_lines | default([]) }}"
-  when: firewall_modules is changed
+  when:
+    # We redo the check, as the previous task will be marked as changed, even when it's marked as skipped: see notes.md
+    - nftables_modules is success
+    - firewall_modules is changed
 
 # From: https://github.com/Frzk/ansible-role-nftables/blob/master/tasks/main.yml
 - name: Disable conflicting services
-  become: yes
   service:
     name: "{{ item }}"
     state: stopped

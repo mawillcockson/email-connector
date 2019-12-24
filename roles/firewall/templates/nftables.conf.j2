@@ -40,4 +40,7 @@ table inet filter {
     }
 }
 
+# nft v0.7 included in Debian 9 will fail to parse this
+# It will fail with "input in flex scanner failed"
+# if include "etc/nftables/"; is used
 include "/etc/nftables/*.conf";

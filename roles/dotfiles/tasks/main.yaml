@@ -13,14 +13,14 @@
   register: dotfiles_install
 
 - name: Check default python version
-  command: python -c "from __future__ import print_function;import sys;print(sys.version_info)"
+  command: 'python -c "from __future__ import print_function;import sys;print(sys.version_info)"'
   register: python_version
 
 - name: Check python3 version
-  command: python3 -c "import sys;print(sys.version_info)"
+  command: 'python3 -c "import sys;print(sys.version_info)"'
   register: python3_version
-  when: 'major=3' not in python_version.stdout
-  failed_when: 'major=3' not in python3_version
+  when: "'major=3' not in python_version.stdout"
+  failed_when: "'major=3' not in python3_version"
 
 - name: Set python executable name
   set_fact:
