@@ -1,4 +1,9 @@
 ---
+- name: Fail if provision_username is root
+  fail:
+    msg: "Please do not select 'root' as the name of provision_username"
+  when: "provision_username == 'root'"
+
 - name: Check if root login is possible
   remote_user: root
   become: no
@@ -17,7 +22,9 @@
   failed_when: false
   ignore_unreachable: true
   register: user_login
-  when: not (root_login is success)
+  when: >
+    (root_login is failure) or
+    (not setup_root|default(false))
 
 - name: "If both root and {{ provision_username }} login are disabled, fail"
   fail:
@@ -27,8 +34,11 @@
 - name: Set login_user name
   set_fact:
     login_user: >-
-      {{ provision_username if (root_login is failed) or 
-                             (root_login is unreachable)
+      {{ provision_username if 
+         ((root_login is failed) or 
+          (root_login is unreachable) or
+          (not setup_root|default(false))
+         )
          else 'root' }}
 
 - name: Check if Python is installed
