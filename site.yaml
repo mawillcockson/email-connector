@@ -1,0 +1,13 @@
+---
+- name: Setup server
+  hosts: all
+  remote_user: '{{ provision_username }}'
+  become: yes
+  vars_files:
+    - vars.yaml
+  gather_facts: no # Don't gather facts until we know which user we can log in as
+  roles:
+    - { role: setup,    tags: ['setup']                                         }
+    - { role: firewall, tags: ['firewall']                                      }
+    - { role: dotfiles, tags: ['dotfiles'], when: setup_dotfiles|default(false) }
+...

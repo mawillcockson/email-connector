@@ -1,0 +1,79 @@
+---
+- name: Check if root login is possible
+  remote_user: root
+  become: no
+  raw: echo worked
+  changed_when: false
+  failed_when: false
+  ignore_unreachable: true
+  register: root_login
+  when: setup_root | default(false)
+
+- name: "Check if {{ provision_username }} login is enabled"
+  remote_user: "{{ provision_username }}"
+  become: yes
+  raw: echo worked
+  changed_when: false
+  failed_when: false
+  ignore_unreachable: true
+  register: user_login
+  when: not (root_login is success)
+
+- name: "If both root and {{ provision_username }} login are disabled, fail"
+  fail:
+    msg: "Cannot login as root or {{ provision_username }}"
+  when: not (root_login is success) or not (user_login is success)
+
+- name: Set login_user name
+  set_fact:
+    login_user: >-
+      {{ provision_username if (root_login is failed) or 
+                             (root_login is unreachable)
+         else 'root' }}
+
+- name: Check if Python is installed
+  remote_user: "{{ login_user }}" 
+  become: "{{ 'no' if root_login is success else 'yes' }}"
+  raw: python --version || python3 --version
+  changed_when: false
+  failed_when: false
+  register: check_python
+
+# NOTE: No idea how to provide a password here if passwordless sudo is not enabled
+- name: Install Python
+  remote_user: root
+  become: no
+  raw: apt-get install -y python3
+  when: check_python.rc != 0
+
+- name: Setup sudo
+  remote_user: "{{ login_user }}"
+  tags: sudo
+  block:
+    - include_tasks: sudo.yaml
+
+- name: Setup SSH
+  remote_user: "{{ login_user }}"
+  tags: ssh
+  block:
+    - include_tasks: ssh.yaml
+
+- name: "Test if {{ provision_username }} login is enabled, if sudo is setup, and if python is installed"
+  become: yes
+  ping:
+    data: pong
+  ignore_unreachable: true
+  register: pong
+
+- name: "Restart ssh manually if it we still can't login as {{ provision_username }}"
+  remote_user: root
+  service:
+    name: sshd
+    state: restarted
+  when: pong is failed or pong is unreachable
+
+- name: Gather facts for real
+  setup:
+    gather_timeout: 5
+  when: pong is failed or pong is unreachable
+...

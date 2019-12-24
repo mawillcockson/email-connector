@@ -1,0 +1,25 @@
+---
+- name: Generate authorized_keys file
+  lineinfile:
+    line: '{{ item }}'
+    path: /etc/ssh/authorized_keys
+    mode: '0444'
+    state: present
+    create: yes
+    unsafe_writes: no
+  loop: "{{ ssh_pub_keys }}"
+
+- name: Update sshd_config
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    mode: '0644'
+  register: update_sshd_config
+
+# If run as a handler, doesn't pick up the remote_user set for this task file
+- name: Restart sshd
+  service:
+    name: ssh
+    state: restarted
+  when: update_sshd_config is changed
+...

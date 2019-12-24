@@ -1,0 +1,38 @@
+---
+- name: Make a temporary directory to download install.py into
+  tempfile:
+    state: directory
+    suffix: dotfiles_install
+  register: dotfiles_temp
+
+- name: Download dotfiles setup
+  get_url:
+    url: https://raw.githubusercontent.com/mawillcockson/dotfiles/dev/install.py
+    dest: "{{ dotfiles_temp.path }}"
+    force: no
+  register: dotfiles_install
+
+- name: Check default python version
+  command: 'python -c "from __future__ import print_function;import sys;print(sys.version_info)"'
+  register: python_version
+
+- name: Check python3 version
+  command: 'python3 -c "import sys;print(sys.version_info)"'
+  register: python3_version
+  when: "'major=3' not in python_version.stdout"
+  failed_when: "'major=3' not in python3_version"
+
+- name: Set python executable name
+  set_fact:
+    python_name: "{{ 'python' if 'major=3' in python_version.stdout else 'python3' }}"
+
+- name: Find correct executable
+  command: which {{ python_name }}
+  register: python_which
+
+- name: Set python_exe
+  set_fact:
+    python3_exe: "{{ python_which.stdout }}"
+
+- name: Run dotfiles install.py
+  command: "{{ python3_exe }} {{ dotfiles_install.dest }}"
