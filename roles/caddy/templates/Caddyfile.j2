@@ -1,0 +1,19 @@
+:80 {
+    root /var/www/blank
+    tls off
+    log stdout
+    errors stderr
+}
+
+(common) {
+    tls {{ email }}
+    log stdout
+    errors stderr
+}
+
+{{ fqdn }} {
+    root {{ web_root|default('/var/www') }}
+    templates / .txt .html
+    ext .txt .html
+    import common
+}

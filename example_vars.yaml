@@ -11,6 +11,12 @@ provision_username: notroot
 ssh_pub_keys:
   - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
+# The following must be changed to your email
+email: myemail@example.com
+
+# Change the following if you want files to be served by Caddy to be located someplace other than /var/www
+#web_root=/var/www
+
 # Uncomment this if, when you provision a computer, you're expected to log in as root via SSH for initial
 # configuration.
 # If left commented, or set to false, the user listed in provision_username is expected to exist, with python,
