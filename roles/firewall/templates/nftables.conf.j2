@@ -24,7 +24,12 @@ table inet filter {
         # Allows return requests to things we send out
         ct state established,related accept;
 
-        # Allow ssh
+        # Allow ICMP
+        # https://wiki.nftables.org/wiki-nftables/index.php/Classic_perimetral_firewall_example
+        ip protocol icmp ct state new accept;
+        ip6 nexthdr icmpv6 ct state new accept;
+
+        # Allow open_ports
         tcp dport @open_ports ct state new accept;
 
         # Drop invalid connections

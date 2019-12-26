@@ -1,12 +1,10 @@
-# general
-What I would like to happen is for the sudo role to fail gracefully if it can't login as root, and retry with the provision_username.
+# Notes
 
-# roles
+## roles
 
 - sudo log_output
   - Send sudo-io to remote logging
 - logging: setup rsyslog
-- dovecot
 
 caddy
   accept-eula
@@ -112,3 +110,20 @@ MSG:
 
 non-zero return code
 ```
+
+## Caddy
+
+https://github.com/caddy-ansible/caddy-ansible
+https://github.com/caddyserver/caddy/tree/master/dist/init/linux-systemd
+
+Example Caddyfile: https://github.com/pyca/infra/blob/master/caddy/Caddyfile
+
+## nftables
+
+Should really read up on nftables: https://wiki.nftables.org
+
+And networking in general
+
+https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Examples
+https://lyngvaer.no/log/simple-nftables-config
+https://wiki.nftables.org/wiki-nftables/index.php/Classic_perimetral_firewall_example

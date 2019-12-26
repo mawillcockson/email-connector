@@ -1,7 +1,7 @@
 ---
-- name: Reload nftables
-  become: yes
-  service:
-    name: nftables
-    state: reloaded
+#- name: Reload nftables
+#  become: yes
+#  service:
+#    name: nftables
+#    state: reloaded
 ...

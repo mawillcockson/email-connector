@@ -9,6 +9,6 @@
   roles:
     - { role: setup,    tags: ['setup']                                         }
     - { role: firewall, tags: ['firewall']                                      }
+    - { role: caddy,    tags: ['caddy']                                         }
     - { role: dotfiles, tags: ['dotfiles'], when: setup_dotfiles|default(false) }
-    - { role: dovecot,  tags: ['dovecot']                                       }
 ...
