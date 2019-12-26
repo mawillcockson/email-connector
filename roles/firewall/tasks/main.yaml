@@ -15,7 +15,7 @@
     group: root
     mode: '0644'
     validate: nft -cf %s
-  notify: Reload nftables
+  notify: reload firewall
 
 - name: Add directory for additional firewall rulesets
   file:
@@ -23,7 +23,7 @@
     state: directory
     owner: root
     group: root
-    mode: "u=rwx,g=rx,o=rx"
+    mode: u=rwx,g=rx,o=rx
 
 # The following three are required to ensure nftables has the necessary kernel modules loaded
 

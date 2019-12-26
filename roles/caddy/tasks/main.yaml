@@ -1,0 +1,221 @@
+---
+- name: Check if email was changed
+  assert:
+    that: email != "myemail@example.com"
+    msg: The email needs to be changed for Caddy to register a certificate
+
+- name: Set variables
+  set_fact:
+    caddy_tarball_path: "{{ web_root|default('/var/www')}}/caddy.tar.gz"
+
+- name: Create Caddy user
+  user:
+    name: www-data
+    system: yes
+    createhome: yes
+    home: "{{ web_root|default('/var/www') }}"
+
+- name: Retrieve latest Caddy release
+  uri:
+    url: "https://api.github.com/repos/caddyserver/caddy/releases/latest"
+    return_content: yes
+    follow_redirects: safe
+  changed_when: false
+  register: caddy_github
+
+# Looks like:
+# {
+#   ...
+#   "name": "1.0.4",
+#   ...
+#   "tag_name": "v1.0.4",
+#   ...
+#   "assets": [
+#     {
+#       ...
+#       "name": "caddy_v1.0.4_linux_amd64.tar.gz",
+#       ...
+#       "browser_download_url": "https://github.com/caddyserver/caddy/releases/download/v1.0.4/caddy_v1.0.4_linux_amd64.tar.gz"
+
+- name: Find latest version number
+  set_fact:
+    latest_caddy_version: "{{ caddy_github.content | regex_search('(?<=tag_name\":\")([\\w\\.\\d]+)(?=\")') }}"
+  # Use the caddyserver.com version, since the GitHub version lists its version as "unknown"
+  #vars:
+  #  query: "assets[?browser_download_url] | [?contains(@, 'linux_amd64') == `true`]"
+
+- name: Update this role if Caddy 2 is released
+  assert:
+    that: "'v1' in latest_caddy_version"
+    msg: "Caddy 2 was released, update this play: https://github.com/caddyserver/caddy/milestone/4"
+
+- name: Get currently installed Caddy version
+  shell: /usr/local/bin/caddy --version || echo unknown
+  ignore_errors: yes
+  register: current_caddy_version
+  changed_when: false
+
+# https://github.com/caddy-ansible/caddy-ansible/blob/41efc1ea66e11a79873951d1c6052e29e13cf2ba/tasks/main.yml#L42
+- name: Get Caddy
+  get_url:
+    # Use the caddyserver.com version, since the GitHub version lists its version as "unknown"
+    url: "https://caddyserver.com/download/linux/amd64?license=personal&telemetry=off"
+    dest: "{{ caddy_tarball_path }}"
+    force: yes
+    timeout: 300
+  retries: 3
+  delay: 2
+  register: caddy_tarball
+  when: not (latest_caddy_version in current_caddy_version.stdout|default(''))
+
+- name: Stat Caddy tarball
+  stat:
+    path: "{{ caddy_tarball_path }}"
+  register: caddy_tarball_stat
+
+- name: Unpack Caddy
+  unarchive:
+    src: "{{ caddy_tarball_path }}"
+    remote_src: yes
+    exclude:
+      - init
+      - README.txt
+      - CHANGES.txt
+      - LICENSES.txt
+    creates: "{{ web_root|default('/var/www') }}/caddy"
+    dest: "{{ web_root|default('/var/www') }}/"
+    owner: www-data
+    group: www-data
+    mode: u=rx,g=rx,o=rx
+  when: caddy_tarball_stat.stat.exists
+
+- name: Remove Caddy tarball
+  file:
+    path: "{{ caddy_tarball_path }}"
+    state: absent
+
+- name: Check if Caddy is a known systemd service
+  command: systemctl list-unit-files caddy.service
+  register: caddy_service
+  changed_when: false
+
+- name: Stat Caddy binary
+  stat:
+    path: "{{ web_root|default('/var/www') }}/caddy"
+  register: caddy_bin_stat
+
+- name: Ensure Caddy is stopped before copying new binary
+  service:
+    name: caddy
+    state: stopped
+  when:
+    - caddy_service.stdout is search("1 unit files listed.")
+    - caddy_bin_stat.stat.exists
+
+- name: Copy new binary into place
+  copy:
+    src: "{{ web_root|default('/var/www') }}/caddy"
+    dest: /usr/local/bin/caddy
+    remote_src: yes
+    owner: www-data
+    mode: u=rx,g=rx,o=rx
+  when: caddy_bin_stat.stat.exists
+  notify: restart caddy
+
+- name: Remove duplicate binary
+  file:
+    path: "{{ web_root|default('/var/www') }}/caddy"
+    state: absent
+
+- name: Create Caddy directories
+  file:
+    path: "{{ item.0 }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "{{ item.1 }}"
+  loop:
+    - - /etc/ssl/caddy
+      - u=rwx,g=rx,o-rwx
+    - - /etc/caddy
+      - u=rwx,g=rwx,o=rx
+    - - /etc/caddy/conf.d
+      - u=rwx,g=rwx,o=rx
+    - - /var/www/blank
+      - u=rwx,g=wrx,o=rx
+
+- name: Copy over website files
+  copy:
+    src: "{{ item.0 }}"
+    dest: "{{ web_root|default('/var/www') }}{{ item.1 }}"
+    force: no
+    owner: www-data
+    group: www-data
+    mode: u=r,g=r,o=r
+  loop:
+    - - ip.txt
+      - ""
+    - - blank.html
+      - /blank/index.html
+
+- name: Create Caddyfile
+  template:
+    dest: /etc/caddy/Caddyfile
+    owner: www-data
+    mode: u=r,g=r,o=r
+    src: Caddyfile.j2
+    validate: /usr/local/bin/caddy -validate -conf %s
+  notify: reload caddy
+
+- name: Download suggested systemd service file
+  get_url:
+    url: "https://raw.githubusercontent.com/caddyserver/caddy/master/dist/init/linux-systemd/caddy.service"
+    backup: yes
+    dest: /var/www/caddy.service
+    owner: www-data
+    group: www-data
+    mode: u=r,g=r,o=r
+  register: caddy_service_file
+
+- name: Make sure the service file hasn't changed since v1.0.4
+  assert:
+    that: caddy_service_file.checksum_src == "bb7f1043b7d29dec31dd71878c1333989a350fd7"
+    msg: "Update this role's systemd caddy.service file: diff /etc/systemd/system/caddy.service /var/www/caddy.service"
+
+- name: Copy caddy.service into place
+  copy:
+    src: caddy.service
+    dest: /etc/systemd/system/caddy.service
+    force: no
+    owner: root
+    group: root
+    mode: u=r,g=r,o=r
+
+- name: Verify systemd is okay with that unit file
+  command: systemd-analyze verify /etc/systemd/system/caddy.service
+  changed_when: false
+  #register: caddy_service_check
+  #failed_when: caddy_service_check.rc == 0
+
+- name: Set capability on Caddy to bind to low-numbered ports
+  capabilities:
+    path: /usr/local/bin/caddy
+    capability: cap_net_bind_service+ep
+    state: present
+
+- name: Copy firewall rules into place
+  copy:
+    src: caddy.nft_rules
+    dest: /etc/nftables/caddy.conf
+    owner: root
+    group: root
+    mode: u=r,g=r,o=r
+    force: no
+  notify: reload firewall
+
+- name: Enable Caddy service
+  service:
+    name: caddy
+    enabled: yes
+  notify: restart caddy
+...

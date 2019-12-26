@@ -1,8 +1,8 @@
 ---
 - name: Fail if provision_username is root
-  fail:
-    msg: "Please do not select 'root' as the name of provision_username"
-  when: "provision_username == 'root'"
+  assert:
+    that: provision_username != 'root'
+    msg: Please do not select 'root' as the name of provision_username
 
 - name: Check if root login is possible
   remote_user: root
@@ -75,7 +75,7 @@
   ignore_unreachable: true
   register: pong
 
-- name: "Restart ssh manually if it we still can't login as {{ provision_username }}"
+- name: "Restart ssh manually if we still can't login as {{ provision_username }}"
   remote_user: root
   service:
     name: sshd

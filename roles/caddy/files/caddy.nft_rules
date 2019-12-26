@@ -1,0 +1,1 @@
+add element inet filter open_ports { http, https }
