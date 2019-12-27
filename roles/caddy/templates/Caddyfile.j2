@@ -1,19 +1,22 @@
+(logs) {
+    log stdout
+    errors stderr
+}
+
+(tls) {
+    tls {{ email }}
+}
+
 :80 {
     root /var/www/blank
     tls off
-    log stdout
-    errors stderr
+    import logs
 }
 
-(common) {
-    tls {{ email }}
-    log stdout
-    errors stderr
-}
-
-{{ fqdn }} {
+{{ fqdn }}:80, {{ fqdn }}:443 {
     root {{ web_root|default('/var/www') }}
-    templates / .txt .html
+    templates / .txt
     ext .txt .html
-    import common
+    import tls
+    import logs
 }

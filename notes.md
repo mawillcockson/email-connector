@@ -127,3 +127,7 @@ And networking in general
 https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes#Examples
 https://lyngvaer.no/log/simple-nftables-config
 https://wiki.nftables.org/wiki-nftables/index.php/Classic_perimetral_firewall_example
+
+This is suggested as it explains conntrack states:
+
+https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#STATEMACHINE
