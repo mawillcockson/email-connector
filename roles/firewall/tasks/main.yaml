@@ -48,12 +48,11 @@
     state: present
     create: yes
   loop: "{{ nftables_modules.stdout_lines | default([]) }}"
-  when: nftables_modules is success
+  # This use to be "success" but that would run this even when nftables_modules was skipped
+  when:
+    - nftables_modules is success 
+    - not (nftables_modules.stdout is search("skipped"))
   register: firewall_modules
-
-- name: debug
-  debug:
-    var: firewall_modules
 
 - name: Load modules
   command: "modprobe {{ item }}"

@@ -5,6 +5,17 @@
   become: yes
   vars_files:
     - vars.yaml
+  handlers:
+    - name: reload firewall
+      become: yes
+      service:
+        name: nftables
+        state: reloaded
+      register: nftables_reload
+      failed_when:
+        - "'status' not in nftables_reload"
+        - not (msg is search("Could not find requested service"))
+      listen: "reload firewall"
   gather_facts: no # Don't gather facts until we know which user we can log in as
   roles:
     - { role: setup,    tags: ['setup']                                         }

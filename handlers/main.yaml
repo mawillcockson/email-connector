@@ -1,7 +1,0 @@
----
-- name: Reload firewall
-  become: yes
-  service:
-    name: nftables
-    state: reloaded
-  listen: "reload firewall"
