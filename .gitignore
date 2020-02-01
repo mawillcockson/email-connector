@@ -1,7 +1,9 @@
 vars.y*ml
 inventory.ini
+Pipfile.lock
 
 /caddy
+update_dns_inner.py
 
 Session.vim
 saved.code-workspace

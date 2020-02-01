@@ -10,4 +10,5 @@ cryptography = "*"
 ansible = "*"
 
 [requires]
-python_version = "3.8"
+#python_version = "3.8"
+#https://github.com/pypa/pipenv/issues/1050

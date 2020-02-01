@@ -12,15 +12,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
 from pathlib import Path
 
-update_dns = "gAAAAABeBlUFa0uj7nGpWLrBbyF0pygwYt6aJTKY6T03Hf2vaAk2Zqg3TZC6qgHVnXEswXmdg7HTSc7WO8EVXtOe5mYUlmOxoePIZCT7oIzXeZ9x7LH1WKK9aCAs62bMrUUzU3E5-v56ms-qwKxNf5_e5ZlMyilU2l4VzeTTb4j9zIN4fcmpCzESh2M4dImEsVh1spH7H0wln-gGCMhsPvgtFR0jW8pZHCMFZnJAP7LY3KmQs2sZ5Lqw1CgVfmFJUEvHdviYzY0dlzI1z91SBUPnaqPZPALaEnA39rTNQOLvxoDsqipoFylCgQAZ7zUGV9kd2rcyk8OggSb-TChyNN21iZJQvvvtS3m7UeUJdz6FsM0khLuVNwYSxgZrfhRuqCUaV1hkuQXz7Ka8CgLdhlWcRyhg87toPG0KFA0i63PLISG8jiDfGuLl7uMKI8QDTg7K8tcljYASanbxe7kviUOOMlhLh5f_LiV60irWmkabVweYIHCFm6iD8yfU4Bxr05edjBs158pGrZ6xk8C5-eFAPfmkeWnAcWigqeTArRk6MzQdB4Km6tCaDbu7b0r1R3bQ2o8WfKyzW6P-1e2eujW161RFWGrJZWmOORtrS71_weCMqKwpJljNFYLU0rDy10cWmNJcrDd7ErzvKTxb5Qg9MjuYBZwndP59NibOMWbcwWCRQP1uBGpyRfi3A7sAZd1dBYDHQ20s8kNUcZCQUpcFzn5yE79DGRBZxR5wNBRgmTsOWfLfc4-PvH4QRPZPfR7GEgtKzdusQpPRJQT1JX2ztdu62R2wgjgc-pU14DJ0rzBC_Y5RSdDngHcAtqh0fBGOLYB6-h51ko72uSM3Fl-1BMH7IXW0M66scsAY3BpB93BTb44toB31-tqEaypc0uLgglhqjeERQ2zGv6lDU2Pq7umboYEXvGjwHeBhKXLDw0QydMsdAJ7BotJJ980SZ1K3AzOTQNuYdDAF8DfQ_h28PFJAzYeUthW3vlqJpKiOCHaD58wjqaXkOy3enVwOY9dVylTC-G2-"
-
-def append_to_this_file(long_string: str) -> None:
-    this_file = Path(sys.argv[0])
-    if not this_file.exists():
-        raise FileNotFoundError("Can't find self")
-    current_contents = this_file.read_text()
-    new_contents = current_contents + f"\n{long_string}"
-    this_file.write_text(new_contents)
+update_dns = "gAAAAABeNdeXpk07Nx9wAaHlkl0f9SJ6AHWrrkVMoY7K98M_WAEJSpP1odzjQwwXU6a61atBMWtnPlgnzoa2UJYxmSL0fkNNz3G3mWowZPYwcw-B2H0ArsA7xJN9GqufvlJ6xo4EXi6FIZ53u6h7P9raa554Fo1I3GT62bwiSkGYExp3xqfARmdi-NImfiOiKNQskIgYHW9zvpvwMEHxSIbSzdfbhVWBuIbFimz2vwwa8h4Ss65P1W1Es4JOO9q0jb73OAMYTOW2HkBqwqauOnppbgN4B_1RqLhe7wfQrX-tFHiW3DVRjzHhyzsA9JG8LdPowYOGG9MBVXpt10NbPAd0jmSL6rtcw-oQpXpvIOTKJdJFol7d-kuD8Y9bTbWnkya5HljXpzcPU1PRxCiwXilGKd3kBEUkMC15hw67JvC70BeVJTh1IPNWGKNp8A1uPqSUQBOvaCBBy4r0JZalxcD3PfA1akiCSa5YOjfXGYBryCuGGScv-S5ycnlyr7IWdeVCBaUKbfqi-o3hVUbuyAEqPGOG0gy2W-kL9p-FLCa_N7_bEe--7F6id6NogLZkmTzpA6cZQ3YU65LJUzzZUnh-fa2rNUPMxi30Tptq4f3GXOJW3rOFhbAL4dn0FlBvLR6RDejNVXWXqbmucmNfwDSgnoQqd2vx6ltfo4_lk2mv14hccSelBTKNlWeU9jFBB1zuqg4Bv5rTr0KNvrn9PVWjWg0He6UnCp77xiWyGpZk7XlbJn4uJu5QP0gtfCea75DzeC5jGqtD9Xuh-c9ulbBxs1syb4UtbRo2IM0M5zkDmO__uO5oNi-F27Ds0buEbz7x-cTjK5djSeQB4g7gGQtEyjZdFOr0Xi2XCm-D99WXMPlGvVIH8gQr3RN0xoRYdt3zU7eZVOpfMu7iwUR0mNTuqqFKtsur5fVoNQn7o-DdMJjNN1tFQ5zYf1ZQQnQ36XFAUI7kAYTuK-hOarUwc2BBBeOpvrmNqQJl5iCj73-aOB7R1G9XDCaXLgxe4URH-rB_UEGZzWDAbYl5U8KwkknaswjVrrCgkz43Yi1EdyW0pibgn51XLBYl302VhWq9LgUZBcTRF42MOpdvWXswojyz5cMca3qKKxew3bLHdA5_dpWD7xqHBtoL--uTkgbH19agmrCuGfmROu98fMqu0BdjegTM5N3kj1JTIpxXr5qKSBlsIQbFSeeCG7JRU_ALeZSV-aBzlQjEBdBQnHkglfe349f2ZqXDguTQ9uloztvInl3Sf5WIM2l3qwoP7lRw81txHXpYdfYqp4-ERHmJGK0J1DcGYLeTMSar0XOh_0IWw8nYcG-toaOCeNfPOSXdfC9XY-QtqTAeGFUObGIJlybkXTtqeIjAEWwMlt3oIqLQ2NMzP7nWxrsl-HOh_Wo1wckk5rJERzoCNe9hJQkjkXa5yDrxZyn6Uf7uTf-gydQoDd4h5jRY8DjADDuxPOTospkKVV1ptIOlEn2Oo40U3V8CLw3kCOiwsf4rZkvucVyibXfS38qe-SmRuZHrxAS-w-vU-xeyo6Wgr6sctUrMAEle_JBe2xetI7o8NkpAM5IXw0U-M3X3wwA3PGTYiqzV5eU0cVeCstl7GiNecqKUxlKlS1ZaxmNxpb2IV36-w5Zi_C2NOzRKBwO9EJFVGZRh7HdUdOwmEHm3"
 
 def crypto_setup(username: str, password: str, salt: str) -> str:
     kdf = Scrypt(
@@ -50,16 +42,10 @@ def crypto_setup(username: str, password: str, salt: str) -> str:
     return f
 
 def main(args: Namespace) -> None:
-    fqdn = args.fqdn
-    ipv4 = str(args.ipv4).encode("utf-8")
-    ipv6 = str(args.ipv6).encode("utf-8")
     username = getpass(prompt="Username: ")
     password = getpass(prompt="Password: ")
     salt     = getpass(prompt="Salt:     ")
     f = crypto_setup(username, password, salt)
-    #append_to_this_file(
-    #    f.encode(update_dns)
-    #)
     exec(
         f.decode(update_dns),
         globals(),
@@ -68,16 +54,40 @@ def main(args: Namespace) -> None:
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Set DNS record for a given subdomain")
-    def check_fqdn(fqdn: str) -> str:
-        if not fqdn.endswith(".willcockson.family"):
-            raise ArgumentTypeError("fqdn needs to be a subdomain of willcockson.family")
-        return fqdn
-    parser.add_argument("fqdn", type=check_fqdn)
-    def to_ip(ip: str) -> Union[IPv4Address, IPv6Address]:
+    def check_qname(qname: str) -> str:
+        if not qname.endswith(".willcockson.family"):
+            raise ArgumentTypeError("QNAME needs to be a subdomain of willcockson.family")
+        return qname
+    parser.add_argument("qname", type=check_qname)
+    # Currently, only the following RR types are supported:
+    # - A
+    # - AAAA
+    # - CAA
+    # - CNAME
+    # - TXT
+    # - MX
+    # - SRV
+    # - SSHFP
+    # - NS
+    def to_ipv6(ip: str) -> str:
         try:
-            return ip_address(ip)
+            return str(IPv6Address(ip)).encode("utf-8")
         except ValueError as err:
             raise ArgumentTypeError(*err.args) from err
-    parser.add_argument("ipv4", type=to_ip)
-    parser.add_argument("ipv6", type=to_ip)
+    parser.add_argument("-6", "--ipv6", type=to_ipv6)
+    def to_ipv4(ip: str) -> str:
+        try:
+            return str(IPv4Address(ip)).encode("utf-8")
+        except ValueError as err:
+            raise ArgumentTypeError(*err.args) from err
+    parser.add_argument("-4", "--ipv4", type=to_ipv4)
+    def utf8(string: str) -> bytes:
+        return str(string).encode("utf-8")
+    parser.add_argument("--caa", type=utf8)
+    parser.add_argument("--cname", type=utf8)
+    parser.add_argument("--txt", type=utf8)
+    parser.add_argument("--mx", type=utf8)
+    parser.add_argument("--srv", type=utf8)
+    parser.add_argument("--sshfp", type=utf8)
+    parser.add_argument("--ns", type=utf8)
     main(parser.parse_args())
